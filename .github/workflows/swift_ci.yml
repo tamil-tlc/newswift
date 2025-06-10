@@ -1,0 +1,36 @@
+name: swift ci
+
+on:
+ push: 
+  branches:
+   - main
+   - dev
+
+jobs:
+ release_and_version:
+  runs-on: macos-latest
+
+  steps:
+   - name: checkout the code
+     uses: actions/checkout@v4
+
+   - name: set version Info.plist
+     run: |
+      plist="build-test-ios"/sample-info.plist"
+      version=$(/usr/libexec/plistBuddy -c "print CFBundleShortVersionString" "$plist"
+      IFS= '.' read -r majer minor patch <<< "$version"
+      patch= $((patch + 1))
+      new_version="$major. $minor. $patch"
+      echo "bumping vertion to $version -> $new_version"
+      /usr/libexec/plistBuddy -c "set :CFBundleShortVersionString $new_version" "plist"
+      build_number= $( date +%s)
+      /usr/libexec/plistBuddy -c "set :CFBundleVersion $build_number" "plist"
+
+      echo "version=$new_version" >> GITHUB_OUTPUT
+      echo "build=$build_number" >> GiTHUB_OUTPUT
+
+      
+  
+ 
+ 
+  
